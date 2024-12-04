@@ -23,7 +23,7 @@ export default function SideNav() {
     <div className="h-screen shadow-md border">
       <div className="p-5">
         {MENU_ITEM.map((menu, index) => (
-          <h2 className={`flex items-center mb-3 gap-3 p-3 border-b-2 hover:bg-primary hover:text-white rounded-md hover:cursor-pointer ${pathName == menu.path ? 'bg-primary text-white' : 'text-gray-700'}`}>
+          <h2 key={index} className={`flex items-center mb-3 gap-3 p-3 border-b-2 hover:bg-primary hover:text-white rounded-md hover:cursor-pointer ${pathName == menu.path ? 'bg-primary text-white' : 'text-gray-700'}`}>
 
             {" "}
             <menu.icon /> {menu.name}
