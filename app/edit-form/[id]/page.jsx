@@ -10,12 +10,13 @@ import FormUI from "../_components/FormUI";
 
 export default function EditForm({ params: paramsPromise }) {
   const [jsonFormData, setJsonFormData] = useState({});
+  const [triggerUpdate, setTriggerUpdate] = useState();
   const router = useRouter();
   const { user } = useUser();
 
   const handleGetForm = async () => {
     try {
-      const resolvedParams = await paramsPromise; 
+      const resolvedParams = await paramsPromise;
       const id = resolvedParams.id;
       if (!user) return;
       const resp = await db
@@ -48,10 +49,33 @@ export default function EditForm({ params: paramsPromise }) {
     }
   };
 
-  
+  const handleFieldUpdate = (value, index) => {
+    console.log("Before update, jsonFormData:", jsonFormData);
+
+    let formData =
+      typeof jsonFormData === "string"
+        ? JSON.parse(jsonFormData)
+        : jsonFormData;
+    const updatedFields = [...formData.fields];
+    updatedFields[index] = {
+      ...updatedFields[index],
+      label: value.label,
+      placeholder: value.placeholder,
+    };
+    const updatedFormData = { ...formData, fields: updatedFields };
+    setJsonFormData(JSON.stringify(updatedFormData));
+    setTriggerUpdate(Date.now());
+  };
+
   useEffect(() => {
     if (user) handleGetForm();
-  }, [user]); 
+  }, [user]);
+
+  useEffect(() => {
+    if (triggerUpdate) {
+      setJsonFormData(jsonFormData);
+    }
+  }, [triggerUpdate]);
 
   return (
     <div className="p-10">
@@ -63,10 +87,9 @@ export default function EditForm({ params: paramsPromise }) {
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="p-5 border rounded-lg shadow-md">Controller</div>
-        <div className="md:col-span-2 border rounded-sm h-screen p-4">
-          {/* Render FormUI only if jsonFormData contains valid data */}
+        <div className="md:col-span-2 border rounded-sm h-max p-4 flex items-center justify-center">
           {Object.keys(jsonFormData).length > 0 && (
-            <FormUI data={jsonFormData} />
+            <FormUI data={jsonFormData} handleFieldUpdate={handleFieldUpdate} />
           )}
         </div>
       </div>
