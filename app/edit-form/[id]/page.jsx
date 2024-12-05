@@ -8,8 +8,9 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import FormUI from "../_components/FormUI";
 
+
 export default function EditForm({ params: paramsPromise }) {
-  const [jsonFormData, setJsonFormData] = useState({});
+  var [jsonFormData, setJsonFormData] = useState({});
   const [triggerUpdate, setTriggerUpdate] = useState();
   const [record, setRecord] = useState();
   const router = useRouter();
@@ -58,13 +59,13 @@ export default function EditForm({ params: paramsPromise }) {
       typeof jsonFormData === "string"
         ? JSON.parse(jsonFormData)
         : jsonFormData;
-    const updatedFields = [...formData.fields];
+    const updatedFields = [...formData.formFields];
     updatedFields[index] = {
       ...updatedFields[index],
       label: value.label,
       placeholder: value.placeholder,
     };
-    const updatedFormData = { ...formData, fields: updatedFields };
+    const updatedFormData = { ...formData, formFields: updatedFields };
     setJsonFormData(JSON.stringify(updatedFormData));
     setTriggerUpdate(Date.now());
   };
@@ -85,8 +86,10 @@ export default function EditForm({ params: paramsPromise }) {
   };
 
   const handleDeleteField = (fieldIndex) => {
-    const result = jsonFormData.fields.filter((item, index) => index != fieldIndex)
-    jsonFormData.fields = result;
+    console.log("JSON Delete Data",jsonFormData)
+    jsonFormData = typeof jsonFormData === "string"? JSON.parse(jsonFormData) : jsonFormData
+    const result = jsonFormData?.formFields.filter((item, index) => index != fieldIndex)
+    jsonFormData.formFields = result;
     setJsonFormData(jsonFormData)
     setTriggerUpdate(Date.now())
   };

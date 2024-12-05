@@ -36,8 +36,8 @@ export default function FormUI({ data, handleFieldUpdate, handleDeleteField }) {
       <h2 className="text-sm text-gray-400 text-center">
         {formData.formSubheading}
       </h2>
-      {formData?.fields?.length > 0 &&
-        formData?.fields.map((item, index) => (
+      {formData?.formFields?.length > 0 &&
+        formData?.formFields.map((item, index) => (
           <div key={index} className="flex items-center gap-2 justify-center">
             <div className="my-3 w-full">
               {item.type == "select" ? (
@@ -62,9 +62,8 @@ export default function FormUI({ data, handleFieldUpdate, handleDeleteField }) {
                   <label className="text-xs text-gray-500">{item.label}</label>
                   <RadioGroup defaultValue={item.options[0].label}>
                     {item.options.map((option, key) => (
-                      <div className="flex items-center space-x-2">
+                      <div key={key} className="flex items-center space-x-2">
                         <RadioGroupItem
-                          key={key}
                           value={option.label}
                           id={option.label}
                         />
@@ -78,7 +77,7 @@ export default function FormUI({ data, handleFieldUpdate, handleDeleteField }) {
                   <label className="text-xs text-gray-500">{item.label}</label>
                   {item.options.length > 0 ? (
                     item?.options.map((option, key) => (
-                      <div className="gap-2">
+                      <div className="flex items-center gap-2">
                         <Checkbox />
                         <h2>{option.label}</h2>
                       </div>
