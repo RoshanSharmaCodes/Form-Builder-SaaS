@@ -5,15 +5,48 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-export default function FieldEdit({ defaultValue, handleFieldUpdate, fieldIndex }) {
+export default function FieldEdit({
+  defaultValue,
+  fieldIndex,
+  handleFieldUpdate,
+  handleDeleteField
+}) {
   const [label, setLabel] = useState(defaultValue.label);
   const [placeholder, setPlaceholder] = useState(defaultValue.placeholder);
   return (
     <div className="flex gap-3">
-      <Trash className="h-5 w-5 text-red-500" />
+      <AlertDialog>
+        <AlertDialogTrigger><Trash className="h-5 w-5 text-red-500" /></AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the field.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={()=>handleDeleteField(fieldIndex)}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      
 
       <Popover>
         <PopoverTrigger>
@@ -42,7 +75,10 @@ export default function FieldEdit({ defaultValue, handleFieldUpdate, fieldIndex 
             size="sm"
             className="mt-3"
             onClick={() =>
-              handleFieldUpdate({ label: label, placeholder: placeholder }, fieldIndex)
+              handleFieldUpdate(
+                { label: label, placeholder: placeholder },
+                fieldIndex
+              )
             }
           >
             Update

@@ -11,6 +11,7 @@ import FormUI from "../_components/FormUI";
 export default function EditForm({ params: paramsPromise }) {
   const [jsonFormData, setJsonFormData] = useState({});
   const [triggerUpdate, setTriggerUpdate] = useState();
+  const [record, setRecord] = useState();
   const router = useRouter();
   const { user } = useUser();
 
@@ -30,6 +31,7 @@ export default function EditForm({ params: paramsPromise }) {
         );
 
       console.log("Form Response:", resp[0]?.jsonForm);
+      setRecord(resp[0]);
       if (resp.length === 0) {
         console.error("No matching record found for the given id.");
         setJsonFormData({});
@@ -67,6 +69,28 @@ export default function EditForm({ params: paramsPromise }) {
     setTriggerUpdate(Date.now());
   };
 
+  const handleFieldUpdateOnDB = async () => {
+    const result = await db
+      .update(jsonForm)
+      .set({
+        jsonForm: jsonFormData,
+      })
+      .where(
+        and(
+          eq(jsonForm.createdBy, user.primaryEmailAddress.emailAddress),
+          eq(jsonForm.id, record.id)
+        )
+      );
+    console.log("DB Updation", result);
+  };
+
+  const handleDeleteField = (fieldIndex) => {
+    const result = jsonFormData.fields.filter((item, index) => index != fieldIndex)
+    jsonFormData.fields = result;
+    setJsonFormData(jsonFormData)
+    setTriggerUpdate(Date.now())
+  };
+
   useEffect(() => {
     if (user) handleGetForm();
   }, [user]);
@@ -74,6 +98,7 @@ export default function EditForm({ params: paramsPromise }) {
   useEffect(() => {
     if (triggerUpdate) {
       setJsonFormData(jsonFormData);
+      handleFieldUpdateOnDB();
     }
   }, [triggerUpdate]);
 
@@ -89,7 +114,7 @@ export default function EditForm({ params: paramsPromise }) {
         <div className="p-5 border rounded-lg shadow-md">Controller</div>
         <div className="md:col-span-2 border rounded-sm h-max p-4 flex items-center justify-center">
           {Object.keys(jsonFormData).length > 0 && (
-            <FormUI data={jsonFormData} handleFieldUpdate={handleFieldUpdate} />
+            <FormUI data={jsonFormData} handleFieldUpdate={handleFieldUpdate} handleDeleteField={handleDeleteField}/>
           )}
         </div>
       </div>

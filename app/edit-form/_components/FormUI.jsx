@@ -13,12 +13,17 @@ import {
 } from "@/components/ui/select";
 import FieldEdit from "./FieldEdit";
 
-export default function FormUI({ data, handleFieldUpdate }) {
+export default function FormUI({ data, handleFieldUpdate, handleDeleteField }) {
   const [formData, setFormData] = useState(data);
 
   useEffect(() => {
     console.log("Data",data)
-    setFormData(JSON.parse(data));
+    if(typeof data === "string"){
+      setFormData(JSON.parse(data));
+    } else{
+      setFormData(data)
+    }
+    
   }, [data]);
 
   useEffect(() => {
@@ -98,8 +103,9 @@ export default function FormUI({ data, handleFieldUpdate }) {
             </div>
             <FieldEdit
               defaultValue={item}
-              handleFieldUpdate={handleFieldUpdate}
               fieldIndex={index}
+              handleFieldUpdate={handleFieldUpdate}
+              handleDeleteField={handleDeleteField}
             />
           </div>
         ))}

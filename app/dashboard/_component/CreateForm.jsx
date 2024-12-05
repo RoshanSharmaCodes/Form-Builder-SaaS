@@ -36,7 +36,7 @@ export default function CreateForm() {
       const resp = await db
         .insert(jsonForm)
         .values({
-          jsonForm: JSON.stringify(cleanedJson),
+          jsonForm: JSON.parse(JSON.stringify(cleanedJson)),
           createdBy: user.primaryEmailAddress?.emailAddress,
           createdAt: moment().format("DD-MM-yyyy"),
         })
