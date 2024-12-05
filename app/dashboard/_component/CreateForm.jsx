@@ -25,16 +25,18 @@ export default function CreateForm() {
   const { user } = useUser();
   const route = useRouter();
 
-  const PROMPT_TEXT = `Description: ${userInput}, On the basis of description please give me form in json format with form title, form subheading with form having form field, form name, placeholder name, and form label, field type, field required in json format.`;
+  const PROMPT_TEXT = `Description: ${userInput}, On the basis of description please give me form in json format with form title, form subheading with form having form field, form name, placeholder name, and form label, field type, field required in json format. And make sure the data is clean and there should be no comments for suggestion or explanation, only json data.`;
 
   const handleCreateForm = async () => {
     setLoading(true);
     const result = await AIChatSession.sendMessage(PROMPT_TEXT);
     if (result.response.text()) {
+      const rawJson = await result.response.text();
+      const cleanedJson = rawJson.trim().replace(/^```json\n|```$/g, ""); // Remove artifacts
       const resp = await db
         .insert(jsonForm)
         .values({
-          jsonForm: result.response.text(),
+          jsonForm: JSON.stringify(cleanedJson),
           createdBy: user.primaryEmailAddress?.emailAddress,
           createdAt: moment().format("DD-MM-yyyy"),
         })
