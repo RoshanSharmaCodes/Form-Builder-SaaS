@@ -13,25 +13,24 @@ import {
 } from "@/components/ui/select";
 import FieldEdit from "./FieldEdit";
 
-export default function FormUI({ data, handleFieldUpdate, handleDeleteField }) {
+export default function FormUI({ data, handleFieldUpdate, handleDeleteField ,activeTheme }) {
   const [formData, setFormData] = useState(data);
 
   useEffect(() => {
-    console.log("Data",data)
-    if(typeof data === "string"){
+    console.log("Data", data);
+    if (typeof data === "string") {
       setFormData(JSON.parse(data));
-    } else{
-      setFormData(data)
+    } else {
+      setFormData(data);
     }
-    
   }, [data]);
 
   useEffect(() => {
     console.log("Form inside UI", formData);
-  }, [formData]);
+  }, [formData, activeTheme]);
 
   return (
-    <div className="border p-5 md:w-[600px]">
+    <div className="border p-5 md:w-[600px] rounded-md" data-theme={activeTheme.toLowerCase()}>
       <h2 className="font-bold text-center text-2xl">{formData.formTitle}</h2>
       <h2 className="text-sm text-gray-400 text-center">
         {formData.formSubheading}
@@ -96,6 +95,7 @@ export default function FormUI({ data, handleFieldUpdate, handleDeleteField }) {
                     type={item.type}
                     placeholder={item.placeholder}
                     name={item.fieldName}
+                    className="bg-transparent"
                   />
                 </div>
               )}
@@ -108,6 +108,7 @@ export default function FormUI({ data, handleFieldUpdate, handleDeleteField }) {
             />
           </div>
         ))}
+        <button className="btn btn-primary">Submit</button>
     </div>
   );
 }

@@ -7,12 +7,15 @@ import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import FormUI from "../_components/FormUI";
+import Controller from "../_components/Controller";
 
 
 export default function EditForm({ params: paramsPromise }) {
   var [jsonFormData, setJsonFormData] = useState({});
   const [triggerUpdate, setTriggerUpdate] = useState();
   const [record, setRecord] = useState();
+  const [activeTheme, setActiveTheme] = useState("light");
+  const [bgTheme, setBGTheme] = useState("");
   const router = useRouter();
   const { user } = useUser();
 
@@ -105,6 +108,10 @@ export default function EditForm({ params: paramsPromise }) {
     }
   }, [triggerUpdate]);
 
+  useEffect(()=>{
+    console.log("Theme Changed", activeTheme)
+  },[activeTheme])
+
   return (
     <div className="p-10">
       <h2
@@ -114,10 +121,12 @@ export default function EditForm({ params: paramsPromise }) {
         <ArrowLeft /> Back
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="p-5 border rounded-lg shadow-md">Controller</div>
-        <div className="md:col-span-2 border rounded-sm h-max p-4 flex items-center justify-center">
+        <div className="p-5 border rounded-lg shadow-md">
+          <Controller selectedBg={(value) => setBGTheme(value)} selectedTheme={(value) => setActiveTheme(value)}/>
+        </div>
+        <div className="md:col-span-2 border rounded-sm h-max p-4 flex items-center justify-center" style={{backgroundImage:bgTheme}}>
           {Object.keys(jsonFormData).length > 0 && (
-            <FormUI data={jsonFormData} handleFieldUpdate={handleFieldUpdate} handleDeleteField={handleDeleteField}/>
+            <FormUI data={jsonFormData} handleFieldUpdate={handleFieldUpdate} handleDeleteField={handleDeleteField} activeTheme={activeTheme}/>
           )}
         </div>
       </div>
