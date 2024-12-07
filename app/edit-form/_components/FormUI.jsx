@@ -21,7 +21,7 @@ export default function FormUI({
   data,
   handleFieldUpdate,
   handleDeleteField,
-  activeTheme,
+  activeTheme="light",
   editable = true,
   formId = 0,
 }) {
@@ -89,7 +89,7 @@ export default function FormUI({
       ref={formRef}
       className="border p-5 md:w-[600px] rounded-md"
       onSubmit={handleFormSubmit}
-      data-theme={activeTheme.toLowerCase()}
+      data-theme={activeTheme == null ? "light" : activeTheme.toLowerCase()}
     >
       <h2 className="font-bold text-center text-2xl">{formData.formTitle}</h2>
       <h2 className="text-sm text-gray-400 text-center">
@@ -104,9 +104,10 @@ export default function FormUI({
                   <label className="text-xs text-gray-500">{item.label}</label>
                   <Select
                     onValueChange={(e) => handleSelectChange(item.fieldName, e)}
+                    className="bg-transparent"
                   >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder={item.placeholder} />
+                    <SelectTrigger className="w-full bg-transparent">
+                      <SelectValue className="bg-transparent" placeholder={item.placeholder} />
                     </SelectTrigger>
                     <SelectContent>
                       {item.options.length > 0 &&
