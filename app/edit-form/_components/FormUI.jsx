@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -12,9 +12,64 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import FieldEdit from "./FieldEdit";
+import { db } from "@/config";
+import { userResponseJson } from "@/config/schema";
+import moment from "moment";
+import { useUser } from "@clerk/nextjs";
 
-export default function FormUI({ data, handleFieldUpdate, handleDeleteField ,activeTheme }) {
+export default function FormUI({
+  data,
+  handleFieldUpdate,
+  handleDeleteField,
+  activeTheme,
+  editable = true,
+  formId = 0,
+}) {
   const [formData, setFormData] = useState(data);
+  const [responseData, setResponseData] = useState();
+  const formRef = useRef();
+  const user = useUser()
+
+  const handleUserResponse = (e) => {
+    const { name, value } = e.target;
+    setResponseData({ ...responseData, [name]: value });
+  };
+
+  const handleSelectChange = (fieldName, value) => {
+    setResponseData({ ...responseData, [fieldName]: value });
+  };
+
+  const handleCheckboxChange = (fieldName, optionName, isChecked) => {
+    const currentSelections = responseData?.[fieldName] || [];
+    let updatedSelections;
+
+    if (isChecked) {
+      updatedSelections = [
+        ...currentSelections,
+        { label: optionName, value: isChecked },
+      ];
+    } else {
+      updatedSelections = currentSelections.filter(
+        (item) => item.label !== optionName
+      );
+    }
+
+    setResponseData({ ...responseData, [fieldName]: updatedSelections });
+    console.log("Updated Selections:", updatedSelections);
+  };
+
+  const handleFormSubmit = async(e) => {
+    e.preventDefault();
+    console.log("form id", formId)
+    const resp = await db.insert(userResponseJson).values({
+      response: responseData,
+      createdAt: moment().format("DD/MM/yyyy"),
+      createdBy: user.user.primaryEmailAddress.emailAddress,
+      formRef: formId,      
+    })
+    formRef.current.reset();
+    console.log("On Save", resp)
+  };
 
   useEffect(() => {
     console.log("Data", data);
@@ -30,7 +85,12 @@ export default function FormUI({ data, handleFieldUpdate, handleDeleteField ,act
   }, [formData, activeTheme]);
 
   return (
-    <div className="border p-5 md:w-[600px] rounded-md" data-theme={activeTheme.toLowerCase()}>
+    <form
+      ref={formRef}
+      className="border p-5 md:w-[600px] rounded-md"
+      onSubmit={handleFormSubmit}
+      data-theme={activeTheme.toLowerCase()}
+    >
       <h2 className="font-bold text-center text-2xl">{formData.formTitle}</h2>
       <h2 className="text-sm text-gray-400 text-center">
         {formData.formSubheading}
@@ -42,7 +102,9 @@ export default function FormUI({ data, handleFieldUpdate, handleDeleteField ,act
               {item.type == "select" ? (
                 <div className="my-3">
                   <label className="text-xs text-gray-500">{item.label}</label>
-                  <Select>
+                  <Select
+                    onValueChange={(e) => handleSelectChange(item.fieldName, e)}
+                  >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder={item.placeholder} />
                     </SelectTrigger>
@@ -65,6 +127,9 @@ export default function FormUI({ data, handleFieldUpdate, handleDeleteField ,act
                         <RadioGroupItem
                           value={option.label}
                           id={option.label}
+                          onClick={() =>
+                            handleSelectChange(item.fieldName, option.label)
+                          }
                         />
                         <Label htmlFor={option.label}>{option.label}</Label>
                       </div>
@@ -77,7 +142,15 @@ export default function FormUI({ data, handleFieldUpdate, handleDeleteField ,act
                   {item.options.length > 0 ? (
                     item?.options.map((option, key) => (
                       <div className="flex items-center gap-2">
-                        <Checkbox />
+                        <Checkbox
+                          onCheckedChange={(v) =>
+                            handleCheckboxChange(
+                              item.fieldName,
+                              option.label,
+                              v
+                            )
+                          }
+                        />
                         <h2>{option.label}</h2>
                       </div>
                     ))
@@ -96,19 +169,25 @@ export default function FormUI({ data, handleFieldUpdate, handleDeleteField ,act
                     placeholder={item.placeholder}
                     name={item.fieldName}
                     className="bg-transparent"
+                    onChange={(e) => handleUserResponse(e)}
+                    required={item.required}
                   />
                 </div>
               )}
             </div>
-            <FieldEdit
-              defaultValue={item}
-              fieldIndex={index}
-              handleFieldUpdate={handleFieldUpdate}
-              handleDeleteField={handleDeleteField}
-            />
+            {editable && (
+              <FieldEdit
+                defaultValue={item}
+                fieldIndex={index}
+                handleFieldUpdate={handleFieldUpdate}
+                handleDeleteField={handleDeleteField}
+              />
+            )}
           </div>
         ))}
-        <button className="btn btn-primary">Submit</button>
-    </div>
+      <button type="submit" className="btn btn-primary">
+        Submit
+      </button>
+    </form>
   );
 }

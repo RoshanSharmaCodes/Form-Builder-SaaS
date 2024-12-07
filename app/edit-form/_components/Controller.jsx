@@ -9,13 +9,20 @@ import {
 import { daisyUIThemes } from "@/app/_data/Theme";
 import formBackgroundThemes from "@/app/_data/BgTheme";
 
-export default function Controller({ selectedTheme, selectedBg }) {
+export default function Controller({
+  selectedTheme,
+  selectedBg,
+  handleFormUpdate,
+}) {
   return (
     <div>
       <h2 className="my-2">Select Themes</h2>
       <Select
         defaultValue="light"
-        onValueChange={(value) => selectedTheme(value)}
+        onValueChange={(value) => {
+          selectedTheme(value);
+          handleFormUpdate(value, "theme");
+        }}
       >
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Theme" />
@@ -64,10 +71,12 @@ export default function Controller({ selectedTheme, selectedBg }) {
         {formBackgroundThemes.map((item, index) => (
           <div
             key={index}
-            onClick={(value) => selectedBg(item.linearGradient)}
+            onClick={(value) => {
+              selectedBg(item.linearGradient);
+              handleFormUpdate(item.linearGradient, "background");
+            }}
             className="w-full h-[70px] rounded-lg hover:border-black hover:border cursor-pointer flex items-center justify-center"
             style={{ background: item.linearGradient }}
-
           >
             {index == 0 && "None"}
           </div>

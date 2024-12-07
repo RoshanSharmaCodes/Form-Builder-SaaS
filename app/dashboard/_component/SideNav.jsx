@@ -7,6 +7,7 @@ import {
   MessageSquare,
   SettingsIcon,
 } from "lucide-react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
@@ -23,11 +24,11 @@ export default function SideNav() {
     <div className="h-screen shadow-md border">
       <div className="p-5">
         {MENU_ITEM.map((menu, index) => (
-          <h2 key={index} className={`flex items-center mb-3 gap-3 p-3 border-b-2 hover:bg-primary hover:text-white rounded-md hover:cursor-pointer ${pathName == menu.path ? 'bg-primary text-white' : 'text-gray-700'}`}>
+          <Link href={menu.path} key={index} className={`flex items-center mb-3 gap-3 p-3 border-b-2 hover:bg-primary hover:text-white rounded-md hover:cursor-pointer ${pathName == menu.path ? 'bg-primary text-white' : 'text-gray-700'}`}>
 
             {" "}
             <menu.icon /> {menu.name}
-          </h2>
+          </Link>
         ))}
         
       </div>
