@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -8,17 +8,24 @@ import {
 } from "@/components/ui/select";
 import { daisyUIThemes } from "@/app/_data/Theme";
 import formBackgroundThemes from "@/app/_data/BgTheme";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function Controller({
   selectedTheme,
   selectedBg,
   handleFormUpdate,
+  setSignInEnable,
+  record
 }) {
+  console.log("Controlled Record",record)
+  useEffect(()=>{
+
+  },[record])
   return (
     <div>
       <h2 className="my-2">Select Themes</h2>
       <Select
-        defaultValue="light"
+        defaultValue={"light"}
         onValueChange={(value) => {
           selectedTheme(value);
           handleFormUpdate(value, "theme");
@@ -81,6 +88,9 @@ export default function Controller({
             {index == 0 && "None"}
           </div>
         ))}
+      </div>
+      <div className="my-3 flex gap-3 items-center">
+        <Checkbox onCheckedChange={(e)=> setSignInEnable(e)}/> <h2 className="text-gray-500">Enable social authentication before submit.</h2>
       </div>
     </div>
   );

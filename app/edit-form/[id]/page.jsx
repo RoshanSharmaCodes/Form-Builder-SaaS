@@ -170,6 +170,8 @@ export default function EditForm({ params: paramsPromise }) {
             handleFormUpdate={handleFormUpdate}
             selectedBg={(value) => setBGTheme(value)}
             selectedTheme={(value) => setActiveTheme(value)}
+            setSignInEnable={(value)=> handleFormUpdate(value,"enableSignIn")}
+            record={record}
           />
         </div>
         <div
@@ -183,6 +185,7 @@ export default function EditForm({ params: paramsPromise }) {
               handleDeleteField={handleDeleteField}
               activeTheme={activeTheme}
               formId={record?.id}
+              enableSignedIn={record?.enableSignIn}
             />
           )}
         </div>

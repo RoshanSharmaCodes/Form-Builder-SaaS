@@ -16,19 +16,24 @@ import { db } from "@/config";
 import { userResponseJson } from "@/config/schema";
 import moment from "moment";
 import { useUser } from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
 
 export default function FormUI({
   data,
   handleFieldUpdate,
   handleDeleteField,
-  activeTheme="light",
+  activeTheme = "light",
   editable = true,
   formId = 0,
+  enableSignedIn = false,
 }) {
   const [formData, setFormData] = useState(data);
   const [responseData, setResponseData] = useState();
   const formRef = useRef();
-  const user = useUser()
+  const { user, isSignedIn } = useUser();
+
+  console.log("enableSignIn", enableSignedIn)
+  console.log("isSignedIn",isSignedIn)
 
   const handleUserResponse = (e) => {
     const { name, value } = e.target;
@@ -58,17 +63,17 @@ export default function FormUI({
     console.log("Updated Selections:", updatedSelections);
   };
 
-  const handleFormSubmit = async(e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    console.log("form id", formId)
+    console.log("form id", formId);
     const resp = await db.insert(userResponseJson).values({
       response: responseData,
       createdAt: moment().format("DD/MM/yyyy"),
       createdBy: user.user.primaryEmailAddress.emailAddress,
-      formRef: formId,      
-    })
+      formRef: formId,
+    });
     formRef.current.reset();
-    console.log("On Save", resp)
+    console.log("On Save", resp);
   };
 
   useEffect(() => {
@@ -107,7 +112,10 @@ export default function FormUI({
                     className="bg-transparent"
                   >
                     <SelectTrigger className="w-full bg-transparent">
-                      <SelectValue className="bg-transparent" placeholder={item.placeholder} />
+                      <SelectValue
+                        className="bg-transparent"
+                        placeholder={item.placeholder}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {item.options.length > 0 &&
@@ -186,9 +194,17 @@ export default function FormUI({
             )}
           </div>
         ))}
-      <button type="submit" className="btn btn-primary">
-        Submit
-      </button>
+      {!enableSignedIn ? (
+        <button type="submit" className="btn btn-primary">
+          Submit
+        </button>
+      ) : isSignedIn ? (
+        <button type="submit" className="btn btn-primary">
+          Submit
+        </button>
+      ) : (
+        <Button mode="modal">SignIn to Submit</Button>
+      )}
     </form>
   );
 }
